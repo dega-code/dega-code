@@ -1,0 +1,87 @@
+const container = document.createElement('div');
+container.style.position = 'fixed';
+container.style.top = '10px';
+container.style.right = '10px';
+container.style.backgroundColor = 'white';
+container.style.padding = '10px';
+container.style.border = '2px solid black';
+container.style.zIndex = '9999';
+container.innerHTML = `
+    <h3>Change Variable Value</h3>
+    <label for="variableName">Variable name:</label><br>
+    <input type="text" id="variableName" placeholder="name"><br><br>
+    
+    <label for="variableValue">New value:</label><br>
+    <input type="text" id="variableValue" placeholder="value"><br><br>
+    
+    <button id="setValueButton">Set value</button>
+    <button id="showVariablesButton">Show variables</button>
+    <button id="closeChangeValue">Close</button>
+    
+    <p id="result"></p>
+`;
+
+document.body.appendChild(container);
+
+// Create a container for the variable list
+const variableListContainer = document.createElement('div');
+variableListContainer.style.position = 'fixed';
+variableListContainer.style.top = '10px';
+variableListContainer.style.left = '10px';
+variableListContainer.style.backgroundColor = 'white';
+variableListContainer.style.padding = '10px';
+variableListContainer.style.border = '2px solid black';
+variableListContainer.style.zIndex = '9999';
+variableListContainer.style.display = 'none'; // Start hidden
+variableListContainer.innerHTML = `
+    <h3>Variable List</h3>
+    <ul id="variableList"></ul>
+    <button id="closeVariableList">Close</button>
+`;
+document.body.appendChild(variableListContainer);
+
+document.getElementById('setValueButton').onclick = function() {
+    const name = document.getElementById("variableName").value;
+    const value = document.getElementById("variableValue").value;
+
+    const target = vm.runtime.getTargetForStage();
+    
+    let variable = null;
+    for (let id in target.variables) {
+        if (target.variables[id].name === name) {
+            variable = target.variables[id];
+            break;
+        }
+    }
+
+    if (variable) {
+        variable.value = value;
+        console.log('Perfectly swapped value to:', variable.value);
+        document.getElementById("result").innerText = `Value of ${name} changed to ${value}`;
+    } else {
+        console.log('Variable with the given name not found');
+        document.getElementById("result").innerText = 'The variable name is not valid';
+    }
+};
+
+document.getElementById('showVariablesButton').onclick = function() {
+    const target = vm.runtime.getTargetForStage();
+    const variableList = document.getElementById('variableList');
+    variableList.innerHTML = '';  // Clear the previous list
+    
+    for (let id in target.variables) {
+        const li = document.createElement('li');
+        li.textContent = target.variables[id].name;
+        variableList.appendChild(li);
+    }
+    
+    variableListContainer.style.display = 'block'; // Show the variable list
+};
+
+document.getElementById('closeChangeValue').onclick = function() {
+    container.style.display = 'none'; // Hide the change variable value container
+};
+
+document.getElementById('closeVariableList').onclick = function() {
+    variableListContainer.style.display = 'none'; // Hide the variable list container
+};
